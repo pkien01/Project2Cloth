@@ -1,18 +1,13 @@
-
 import java.util.ArrayList;
 
-//proper proper working code
-//long lastFrameStart = millis();
 int width = 800;
 float aspect_ratio = 5.0/8.0;
 //float minDist = 0.000012;
 boolean isMousePressed = false;
 Vec2 mousePos = new Vec2(0, 0);
-//float dt = 0.01; // Time step
-//float k_smooth_radius = 0.075;
+
 float k_smooth_radius = 0.06;
-//float k_smooth_radius = 0.035;
-//float k_smooth_radius = 0.02;
+
 float k_stiff = 150.0;
 float k_stiffN = 1000.0;
 float k_rest_density = 0.2;
@@ -27,84 +22,63 @@ ArrayList<Particle> particles = new ArrayList<Particle>();
 ArrayList<Particle> wb = new ArrayList<Particle>();
 
 void setup() {
-  //size(width, int(width * aspect_ratio));
   size(800, 500);
   
-  //ground = new Vec2(0, height * 0.8);
   waterbody = new Vec2(0, height * 0.8);
   for (int i = 0; i < r; i++) {
     for (int j = 0; j < n; j++) {
       float x = -1 + 2 * j / float(n) + 0.1 * i / float(r);
-      float y = (aspect_ratio * (0.5 - 1.5 * i / float(r))) + (0.625 - 0.000875);
+      float y = (aspect_ratio * (0.5 - 1.5 * i / float(r)))+(-0.625 + 0.25);
       particles.add(new Particle(x, y));
     }
   }
   
   for(int i = 0; i < 80; i++) {
-    for(int j = 0; j < 2; j++){
+    for(int j = 0; j < 5; j++){
       float x = i*5*2 + 5;
       float y = (500 - j*5*2) + 5;
       
-      //ellipse(x, y, 20,20);
       wb.add(new Particle(x,y));
-      //pc++;
     }
   }
+  
+  
 }
 
 
 long lastFrameStart = millis();
 void draw() {
-  background(150, 200, 255);
+  background(10, 20, 25);
   
-  //fill(100, 100, 100);
-  //triangle(100, ground.y, 300, 200, 500, ground.y);
-  //triangle(400, ground.y, 600, 150, 800, ground.y);  
-  
-  //fill(0, 0, 255);
-  //rect(0, waterbody.y, width, height - waterbody.y);
-  
-  //fill(34, 139, 34); // Green color
-  //rect(0, ground.y, width, height - ground.y);
-  
-  System.out.println(" millis "+ millis()/1000.0 + " lastFrameStart " + lastFrameStart/1000.0);
   float dt = (millis() - lastFrameStart) / 1000.0;  // Calculate the time elapsed since the last frame in seconds
-  //float dt = 
   lastFrameStart = millis();
-  
-  //System.out.println(" dt " + dt + " lastFrameStart " + lastFrameStart);
-  
+    
   mousePos.x = mouseX * 1.0 / width * 2 - 1;
   mousePos.y = mouseY * 1.0 / (width * aspect_ratio) * 2 - aspect_ratio;
   
   for (int i = 0; i < 10; i++) {
     float sim_dt = dt / 10.0;
-    //sim_dt = min(sim_dt, 0.003);
     sim_dt = min(sim_dt, 0.002);
-    //simulateSPH(particles, k_smooth_radius, k_rest_density, k_stiff, k_stiffN, mousePos, grab_radius, aspect_ratio, dt / 10.0);
     simulateSPH(particles, k_smooth_radius, k_rest_density, k_stiff, k_stiffN, mousePos, grab_radius, aspect_ratio, sim_dt);
-    //particles, k_smooth_radius, k_rest_density, k_stiff, k_stiffN, mousePos, grab_radius, aspect_ratio, sim_dt
   }
 
   // Draw particles
+  fill(253, 235, 235);
+  circle(125, 100, 67);
+  
   for (Particle p : particles) {
-    //p.pos.add(p.vel.times(dt));
     float q = p.press / 30.0;
-    //fill(155 - q * 155, 155 - q * 155, 155 - q * 155);
-    fill(178.5-q*0.5,204-q*0.4,255-q*0.2);
-    //fill(190, 190, 190);
-    //noStroke();
-    stroke(1);
-    //ellipse(map(p.pos.x, -1, 1, 0, width), map(p.pos.y, -aspect_ratio, aspect_ratio, 0, height), 12, 12);
+    fill(178.5-q*0.5,204-q*0.5,255-q*0.5);
     circle(map(p.pos.x, -1, 1, 0, width), map(p.pos.y, -aspect_ratio, aspect_ratio, 0, height), 12);
   }
   
+  
   for(Particle p : wb)
   {
-    fill(0, 0, 255);
+    fill(255,255,255);
     circle(p.pos.x, p.pos.y, 10);
   }
-  System.out.println(" millis "+ (millis()-lastFrameStart)/1000.0);
+  //System.out.println(" millis "+ (millis()-lastFrameStart)/1000.0);
 }
 
 void mousePressed() {
@@ -114,15 +88,6 @@ void mousePressed() {
     p.grabbed = (d < grab_radius * width);
   }
 }
-
-//void mousePressed() {
-//for (Particle p : particles) {
-//    float distance = dist(mouseX, mouseY, p.pos.x, p.pos.y);
-//    if (distance < 50) {
-//      p.vel.y = random(-5, -10);
-//    }
-//  }
-//}
 
 void mouseReleased() {
   isMousePressed = false;
@@ -138,40 +103,10 @@ void simulateSPH(ArrayList<Particle> particles, float k_smooth_radius, float k_r
     p.vel = p.pos.minus(p.oldPos).times(1/dt);
     p.vel.add(new Vec2(0.0, 230).times(dt));
     
-    
-    //if (p.pos.y < -aspect_ratio) {
-    //  p.pos.y = -aspect_ratio;
-    //  p.vel.y *= -0.2;
-    //}
-    
-    //if(map(p.pos.y, -aspect_ratio, aspect_ratio, 0, height) + 12 > waterbody.y);
-    //{
-    //  p.pos.y = waterbody.y - 12;
-    //  p.vel.y *= -1;
-    //  p.vel.y *= damping;
-    //}
-    
-    if (p.pos.y > aspect_ratio) {
-      //p.pos.y = aspect_ratio;
-      p.pos.y = 0.000875;
+    if (p.pos.y > aspect_ratio-(0.02083333*5)) {
+      p.pos.y = aspect_ratio-(0.02083333*5);
       p.vel.y *= -0.2;  // Bounce with some restitution
     }
-    
-    //if (p.pos.y > aspect_ratio + ground.y) {
-    //  p.pos.y = aspect_ratio + ground.y;
-    //  p.vel.y *= -1;
-    //  p.vel.y *= damping;
-    //}
-    
-    //if (p.pos.y > aspect_ratio + aspect_ratio*415) {
-    //  //p.pos.y = aspect_ratio + aspect_ratio*415;
-    //  p.pos.y = -1.0;
-    //  p.vel.y *= -0.2;
-    //}
-    //if(map(p.pos.y, -aspect_ratio, aspect_ratio, 0, height) < 415) {
-    //  p.pos.y = 415;
-    //  p.vel.y *= -0.2;
-    //}
     
     if (p.pos.x < -1.0) {
       p.pos.x = -1.0;
@@ -183,7 +118,7 @@ void simulateSPH(ArrayList<Particle> particles, float k_smooth_radius, float k_r
     }
     
     if (p.grabbed) {
-      p.vel.add(mousePos.minus(p.pos).times(1/grab_radius).minus(p.vel).times(10).times(dt));
+      p.vel.add(mousePos.minus(p.pos).times(1/grab_radius).minus(p.vel).times(230).times(dt));
     }
     
     p.oldPos = p.pos;
@@ -199,12 +134,8 @@ void simulateSPH(ArrayList<Particle> particles, float k_smooth_radius, float k_r
         Particle particleA = particles.get(i);
         Particle particleB = particles.get(j);
         float dist = particles.get(i).pos.distanceTo(particles.get(j).pos);
-        //Vec2 distVec = particles.get(i).pos.minus(particles.get(j).pos);
-        Vec2 distVec = particleA.pos.minus(particleB.pos);
-        //float d = distVec.length();
-        //if(d == dist){
-        //  System.out.println("YESS");
-        //}
+        //Vec2 distVec = particleA.pos.minus(particleB.pos);
+
         if (dist < k_smooth_radius) {
           float q = 1 - (dist / k_smooth_radius);
           pairs.add(new Pair(particles.get(i), particles.get(j), q));
@@ -228,46 +159,14 @@ void simulateSPH(ArrayList<Particle> particles, float k_smooth_radius, float k_r
     if (particles.get(i).pressN > 300) particles.get(i).pressN = 300;
   }
   
-  //for (Pair p : pairs) {
-  //  p.p1.dens += (p.q * p.q);
-  //  p.p2.dens += (p.q * p.q);
-  //  p.p1.densN += (p.q * p.q * p.q);
-  //  p.p2.densN += (p.q * p.q * p.q);
-  //}
-  
-  //for (Particle p : particles) {
-  //  p.press = k_stiff * (p.dens - k_rest_density);
-  //  p.pressN = k_stiffN * p.densN;
-  //  if (p.press > 30) p.press = 30;
-  //  if (p.pressN > 300) p.pressN = 300;
-  //}
-  
   for (Pair pair : pairs) {
     Particle a = pair.p1;
     Particle b = pair.p2;
     float total_pressure = (a.press + b.press) * pair.q + (a.pressN + b.pressN) * pair.q2;
-    float displace = total_pressure * sq(dt) + 0.000299;
+    float displace = total_pressure * sq(dt) + 0.000499;
     a.pos.add((a.pos.minus(b.pos).normalized()).times(displace));
     b.pos.add((b.pos.minus(a.pos).normalized()).times(displace));
   }
-  
-  //for(Pair pair : pairs)
-  //{
-  //  Particle a = pair.p1;
-  //  Particle b = pair.p2;
-  //  float distance = dist(a.pos.x, a.pos.y, b.pos.x, b.pos.y);
-  //  if (distance < 12 * 2) 
-  //  {
-  //    // Bounce off other particles
-  //    //PVector direction = PVector.sub(a.pos, b.pos);
-  //    Vec2 direction = a.pos.minus(b.pos);
-  //    direction.normalize();
-  //    Vec2 temp = direction.times(12 * 2 - distance);
-  //    a.pos.add(temp);
-  //    a.vel.mul(-1);
-  //    a.vel.mul(damping);  // Apply damping
-  //  }
-  //}
   System.out.println("  End timesph  " +  ((millis()-st)/1000.0));
 }
 
@@ -399,7 +298,7 @@ class Particle {
     this.pos = new Vec2(x, y);
     this.oldPos = new Vec2(x, y);
     //this.vel = new Vec2(0, 10);
-    this.vel = new Vec2(0, 50);
+    this.vel = new Vec2(0, 75);
     this.press = 0.0;
     this.dens = 0.0;
     this.pressN = 0.0;
